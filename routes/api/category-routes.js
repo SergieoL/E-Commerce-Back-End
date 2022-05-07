@@ -6,7 +6,14 @@ const { Category, Product } = require('../../models');
 router.get('/', (req, res) => {
   // find all categories
   // be sure to include its associated Products
-  Category.findAll()
+  Category.findAll({
+    include: [
+      {
+        model: Product,
+        //attributes: ['product_name', 'price']
+      }
+    ]
+  })
   .then(dbCategoryData => res.json(dbCategoryData))
   .catch(err => {
     console.log(err);
@@ -20,19 +27,26 @@ router.get('/:id', (req, res) => {
   Category.findOne({
     where: {
       id: req.params.id
-    }
+    },
+    include: [
+      {
+        model: Product
+      }
+    ]
   })
   .then(dbCategoryData => {
     if (!dbCategoryData) {
-      res.status(404).json({ message: 'No category found with this id'});
+      res.status(400).json({ message: 'No category found with thid id'});
       return;
     }
+    res.json(dbCategoryData);
   })
   .catch(err => {
     console.log(err);
     res.status(500).json(err);
   })
-});
+  })
+
 
 router.post('/', (req, res) => {
   // create a new category
